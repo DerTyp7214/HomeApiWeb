@@ -15,5 +15,5 @@
 }
 
 input {
-  background-color: rgb(56 58 66);
+  background-color: rgb(56 58 66) !important;
 }
