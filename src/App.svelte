@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { checkApiUrl, checkApiKey, login, signup } from './api'
+  import { checkApiUrl, checkJWT, login, signup } from './api'
   import Layout from './routes/+layout.svelte'
 
   let connected = false
@@ -18,7 +18,7 @@
       error = true
     })
 
-  checkApiKey()
+  checkJWT()
     .then(() => {
       unauthorized = false
       authorized = true

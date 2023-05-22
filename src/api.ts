@@ -2,7 +2,7 @@ let _apiUrl =
   localStorage.getItem('apiUrl') ??
   `${window.location.protocol}//${window.location.host}/api`
 
-let _apiKey = localStorage.getItem('apiKey')
+let _jwt = localStorage.getItem('jwt')
 
 export const setApiUrl = (url: string) => {
   _apiUrl = url
@@ -10,10 +10,10 @@ export const setApiUrl = (url: string) => {
   return localStorage.getItem('apiUrl')
 }
 
-export const setApiKey = (key: string) => {
-  _apiKey = key
-  localStorage.setItem('apiKey', key)
-  return localStorage.getItem('apiKey')
+export const setJWT = (key: string) => {
+  _jwt = key
+  localStorage.setItem('jwt', key)
+  return localStorage.getItem('jwt')
 }
 
 export const checkApiUrl = async (count: number = 0) => {
@@ -35,11 +35,11 @@ export const checkApiUrl = async (count: number = 0) => {
   return checkApiUrl(count + 1)
 }
 
-export const checkApiKey = async () => {
+export const checkJWT = async () => {
   try {
     const res = await fetch(`${_apiUrl}/auth/me`, {
       headers: {
-        Authorization: `Bearer ${_apiKey}`,
+        Authorization: `Bearer ${_jwt}`,
       },
     })
 
@@ -66,7 +66,7 @@ export const signup = async (
   })
   if (res.ok) {
     const { access_token } = await res.json()
-    setApiKey(access_token)
+    setJWT(access_token)
     return true
   }
   throw new Error('Failed to signup')
@@ -82,14 +82,14 @@ export const login = async (email: string, password: string) => {
   })
   if (res.ok) {
     const { access_token } = await res.json()
-    setApiKey(access_token)
+    setJWT(access_token)
     return true
   }
   throw new Error('Failed to login')
 }
 
 export const logout = async () => {
-  setApiKey(null)
+  setJWT(null)
   location.reload()
   return true
 }
@@ -97,7 +97,7 @@ export const logout = async () => {
 export const getLights = async () => {
   const res = await fetch(`${_apiUrl}/lights`, {
     headers: {
-      Authorization: `Bearer ${_apiKey}`,
+      Authorization: `Bearer ${_jwt}`,
     },
   })
   if (res.ok) {
@@ -109,7 +109,7 @@ export const getLights = async () => {
 export const getPlugs = async () => {
   const res = await fetch(`${_apiUrl}/plugs`, {
     headers: {
-      Authorization: `Bearer ${_apiKey}`,
+      Authorization: `Bearer ${_jwt}`,
     },
   })
   if (res.ok) {
@@ -121,7 +121,7 @@ export const getPlugs = async () => {
 export const getLight = async (id: string) => {
   const res = await fetch(`${_apiUrl}/lights/${id}`, {
     headers: {
-      Authorization: `Bearer ${_apiKey}`,
+      Authorization: `Bearer ${_jwt}`,
     },
   })
   if (res.ok) {
@@ -133,7 +133,7 @@ export const getLight = async (id: string) => {
 export const getPlug = async (id: string) => {
   const res = await fetch(`${_apiUrl}/plugs/${id}`, {
     headers: {
-      Authorization: `Bearer ${_apiKey}`,
+      Authorization: `Bearer ${_jwt}`,
     },
   })
   if (res.ok) {
@@ -146,7 +146,7 @@ export const setLight = async (id: string, state: LightInput) => {
   const res = await fetch(`${_apiUrl}/lights/${id}/state`, {
     method: 'PUT',
     headers: {
-      Authorization: `Bearer ${_apiKey}`,
+      Authorization: `Bearer ${_jwt}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(state),
@@ -161,7 +161,7 @@ export const setPlug = async (id: string, state: PlugInput) => {
   const res = await fetch(`${_apiUrl}/plugs/${id}/state`, {
     method: 'PUT',
     headers: {
-      Authorization: `Bearer ${_apiKey}`,
+      Authorization: `Bearer ${_jwt}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(state),
@@ -176,7 +176,7 @@ export const hueConfig = async (ip: string) => {
   const res = await fetch(`${_apiUrl}/hue/config/add`, {
     method: 'PUT',
     headers: {
-      Authorization: `Bearer ${_apiKey}`,
+      Authorization: `Bearer ${_jwt}`,
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
@@ -192,7 +192,7 @@ export const hueDelete = async (bridgeId: string) => {
   const res = await fetch(`${_apiUrl}/hue/config/${bridgeId}`, {
     method: 'DELETE',
     headers: {
-      Authorization: `Bearer ${_apiKey}`,
+      Authorization: `Bearer ${_jwt}`,
       'Content-Type': 'application/json',
     },
   })
@@ -206,7 +206,7 @@ export const hueInit = async (bridgeId: string) => {
   const res = await fetch(`${_apiUrl}/hue/init/${bridgeId}`, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${_apiKey}`,
+      Authorization: `Bearer ${_jwt}`,
       'Content-Type': 'application/json',
     },
   })
@@ -218,7 +218,7 @@ export const hueInit = async (bridgeId: string) => {
 
 export const connectWebSocket = () => {
   const ws = new WebSocket(
-    _apiUrl.replace('http://', 'ws://').replace('/api', '/ws') + `?token=${_apiKey}`
+    _apiUrl.replace('http://', 'ws://').replace('/api', '/ws') + `?token=${_jwt}`
   )
   ws.addEventListener('open', () => {
     console.log('WebSocket connected')
