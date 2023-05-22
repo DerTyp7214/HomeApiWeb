@@ -5,7 +5,7 @@
 
 <button
   {type}
-  class="flex flex-row items-center justify-center p-2 border-2 rounded-lg hover:bg-white/10 transition-all active:bg-white/20"
+  class="border-black dark:border-white flex flex-row items-center justify-center p-2 border-2 rounded-lg hover:bg-white/10 transition-all active:bg-white/20"
   on:click={click}
 >
   <slot name="icon" />

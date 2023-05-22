@@ -40,7 +40,7 @@
 <div
   id="light"
   style="--color: {color}"
-  class="rounded-md w-36 h-36 flex flex-col justify-center items-center m-2 border-2 cursor-pointer hover:border-4 hover:scale-110 relative"
+  class="border-black dark:border-white rounded-md w-36 h-36 flex flex-col justify-center items-center m-2 border-2 cursor-pointer hover:border-4 hover:scale-110 relative"
   on:click={toggleLight}
 >
   <MenuButton
@@ -92,6 +92,15 @@
 
 <style>
   div#light {
+    background: linear-gradient(
+      135deg,
+      var(--color) 0%,
+      color-mix(in xyz, var(--color) 20%, white) 100%
+    );
+
+    transition: all 0.2s ease-in-out;
+  }
+  :is(.dark div#light) {
     background: linear-gradient(
       135deg,
       var(--color) 0%,

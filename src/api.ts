@@ -1,3 +1,5 @@
+import { userStore } from './stores'
+
 let _apiUrl =
   localStorage.getItem('apiUrl') ??
   `${window.location.protocol}//${window.location.host}/api`
@@ -35,7 +37,7 @@ export const checkApiUrl = async (count: number = 0) => {
   return checkApiUrl(count + 1)
 }
 
-export const checkJWT = async () => {
+export const me = async () => {
   try {
     const res = await fetch(`${_apiUrl}/auth/me`, {
       headers: {
@@ -44,7 +46,9 @@ export const checkJWT = async () => {
     })
 
     if (res.status === 200) {
-      return true
+      const user = await res.json()
+      userStore.set(user)
+      return user
     }
   } catch (e) {
     console.error(e)
@@ -67,6 +71,7 @@ export const signup = async (
   if (res.ok) {
     const { access_token } = await res.json()
     setJWT(access_token)
+    await me()
     return true
   }
   throw new Error('Failed to signup')
@@ -83,6 +88,7 @@ export const login = async (email: string, password: string) => {
   if (res.ok) {
     const { access_token } = await res.json()
     setJWT(access_token)
+    await me()
     return true
   }
   throw new Error('Failed to login')
@@ -216,9 +222,36 @@ export const hueInit = async (bridgeId: string) => {
   throw new Error('Failed to init hue')
 }
 
+export const setProfilePicture = async (file: File) => {
+  const res = await fetch(`${_apiUrl}/user/profile_pic`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${_jwt}`,
+    },
+    body: file,
+  })
+  if (res.ok) {
+    return true
+  }
+  throw new Error('Failed to set profile picture')
+}
+
+export const getProfilePicture = async () => {
+  const res = await fetch(`${_apiUrl}/user/profile_pic`, {
+    headers: {
+      Authorization: `Bearer ${_jwt}`,
+    },
+  })
+  if (res.ok) {
+    return res.blob()
+  }
+  throw new Error('Failed to get profile picture')
+}
+
 export const connectWebSocket = () => {
   const ws = new WebSocket(
-    _apiUrl.replace('http://', 'ws://').replace('/api', '/ws') + `?token=${_jwt}`
+    _apiUrl.replace('http://', 'ws://').replace('/api', '/ws') +
+      `?token=${_jwt}`
   )
   ws.addEventListener('open', () => {
     console.log('WebSocket connected')

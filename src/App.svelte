@@ -1,6 +1,9 @@
 <script lang="ts">
-  import { checkApiUrl, checkJWT, login, signup } from './api'
+  import { bind } from 'svelte/internal'
+  import { checkApiUrl, me, login, signup } from './api'
   import Layout from './routes/+layout.svelte'
+  import { userStore } from './stores'
+  import type { User } from './types'
 
   let connected = false
   let error = false
@@ -10,6 +13,13 @@
 
   let doSignup = false
 
+  let user: User
+
+  userStore.subscribe((value) => {
+    user = value
+    console.log(user)
+  })
+
   checkApiUrl()
     .then(() => {
       connected = true
@@ -18,7 +28,7 @@
       error = true
     })
 
-  checkJWT()
+  me()
     .then(() => {
       unauthorized = false
       authorized = true
@@ -62,7 +72,7 @@
   }
 </script>
 
-<main class="dark">
+<main class="h-full w-full">
   {#if unauthorized}
     {#if doSignup}
       <form
@@ -145,7 +155,9 @@
     {/if}
   {:else if authorized}
     {#if connected}
-      <Layout />
+      <div class="h-full">
+        <Layout {user} />
+      </div>
     {:else if error}
       <h1 class="text-2xl font-bold">Error</h1>
     {:else}
