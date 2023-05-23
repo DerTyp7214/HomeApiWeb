@@ -178,7 +178,7 @@ export const setPlug = async (id: string, state: PlugInput) => {
   throw new Error('Failed to set plug')
 }
 
-export const hueConfig = async (ip: string) => {
+export const addHueBridge = async (ip: string) => {
   const res = await fetch(`${_apiUrl}/hue/config/add`, {
     method: 'PUT',
     headers: {
@@ -190,11 +190,13 @@ export const hueConfig = async (ip: string) => {
   })
   if (res.ok) {
     return await res.json()
+  } else if (res.status === 409) {
+    return await res.json()
   }
   throw new Error('Failed to set config')
 }
 
-export const hueDelete = async (bridgeId: string) => {
+export const deleteHueBridge = async (bridgeId: string) => {
   const res = await fetch(`${_apiUrl}/hue/config/${bridgeId}`, {
     method: 'DELETE',
     headers: {
@@ -208,7 +210,7 @@ export const hueDelete = async (bridgeId: string) => {
   throw new Error('Failed to delete config')
 }
 
-export const hueInit = async (bridgeId: string) => {
+export const initHueBridge = async (bridgeId: string) => {
   const res = await fetch(`${_apiUrl}/hue/init/${bridgeId}`, {
     method: 'GET',
     headers: {
@@ -218,6 +220,10 @@ export const hueInit = async (bridgeId: string) => {
   })
   if (res.ok) {
     return res.json()
+  } else if (res.status === 401) {
+    return await res.json()
+  } else if (res.status === 500) {
+    return await res.json()
   }
   throw new Error('Failed to init hue')
 }
@@ -246,6 +252,18 @@ export const getProfilePicture = async () => {
     return res.blob()
   }
   throw new Error('Failed to get profile picture')
+}
+
+export const getHueBridges = async () => {
+  const res = await fetch(`${_apiUrl}/hue/bridges`, {
+    headers: {
+      Authorization: `Bearer ${_jwt}`,
+    },
+  })
+  if (res.ok) {
+    return res.json()
+  }
+  throw new Error('Failed to get hue bridges')
 }
 
 export const connectWebSocket = () => {

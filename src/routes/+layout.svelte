@@ -7,20 +7,18 @@
     connectWebSocket,
     getLights,
     getPlugs,
-    hueConfig,
-    hueInit,
-    hueDelete,
+    addHueBridge,
+    initHueBridge,
+    deleteHueBridge,
     logout,
     getProfilePicture,
   } from '../api'
   import LightElement from '../components/+lightElement.svelte'
   import PlugElement from '../components/+plugElement.svelte'
   import CustomButton from '../components/+customButton.svelte'
-  import Modal, { getModal } from '../components/+modal.svelte'
   import type { User } from '../types'
   import {
     Avatar,
-    Button,
     DarkMode,
     Dropdown,
     DropdownDivider,
@@ -39,24 +37,44 @@
     SpeedDial,
     SpeedDialButton,
   } from 'flowbite-svelte'
+  import Settings from '../components/+settings.svelte'
+  import { bridgeStore, lightsStore, plugsStore, userStore } from '../stores'
+  import AddHue from '../components/+addHue.svelte'
 
   let lights: { [key: string]: Light } = {}
   let plugs: { [key: string]: Plug } = {}
 
   export let user: User
 
-  let profilePicture: string = null
+  let settingsOpen = false
+  let addHueOpen = false
+
+  lightsStore.subscribe((value) => {
+    lights = {}
+    value.forEach((light) => {
+      lights[light.id] = light
+    })
+  })
+
+  plugsStore.subscribe((value) => {
+    plugs = {}
+    value.forEach((plug) => {
+      plugs[plug.id] = plug
+    })
+  })
+
+  bridgeStore.subscribe((value) => {
+    if (value) {
+      loadDevices()
+    }
+  })
 
   async function loadDevices() {
     const lightsData = await getLights()
-    lightsData.forEach((light) => {
-      lights[light.id] = light
-    })
+    lightsStore.set(lightsData)
 
     const plugsData = await getPlugs()
-    plugsData.forEach((plug) => {
-      plugs[plug.id] = plug
-    })
+    plugsStore.set(plugsData)
   }
 
   const ws = connectWebSocket()
@@ -80,18 +98,18 @@
   })
 
   getProfilePicture().then((picture) => {
-    profilePicture = URL.createObjectURL(picture)
+    const profilePicture = URL.createObjectURL(picture)
+    userStore.update((user) => ({ ...user, profilePicture }))
   })
 
   async function addHue() {
-    getModal('info-modal').close()
     const ip = prompt(
       'Enter the IP of your Hue Bridge, press the button and click OK'
     )
-    const config = await hueConfig(ip).catch(() => null)
+    const config = await addHueBridge(ip).catch(() => null)
 
     if (config) {
-      const init = await hueInit(config.id)
+      const init = await initHueBridge(config.id)
         .then(() => true)
         .catch(() => false)
 
@@ -99,7 +117,7 @@
         loadDevices()
         return
       } else {
-        await hueDelete(config.id)
+        await deleteHueBridge(config.id)
       }
     }
     alert('Something went wrong')
@@ -108,7 +126,7 @@
   loadDevices()
 </script>
 
-<div class="fixed w-full p-4 top-0 left-0 z-50">
+<div class="fixed w-full p-4 top-0 left-0 z-30">
   <Navbar
     let:hidden
     let:toggle
@@ -125,7 +143,26 @@
         btnClass="text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-lg text-sm p-2.5 mr-2"
       />
       <Avatar id="avatar-menu" class="cursor-pointer overflow-hidden">
-        <img src={profilePicture} alt="profile" class="w-full h-full pointer-events-none" />
+        {#if user.profilePicture}
+          <img
+            src={user.profilePicture}
+            alt="profile"
+            class="w-full h-full pointer-events-none"
+          />
+        {:else}
+          <svg
+            class="text-gray-400 bg-gray-100 dark:bg-gray-600 rounded-full"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        {/if}
       </Avatar>
       <NavHamburger
         on:click={toggle}
@@ -140,7 +177,9 @@
       <DropdownDivider
         divClass="my-1 h-px bg-gray-200/80 dark:bg-gray-700/40"
       />
-      <DropdownItem>Settings</DropdownItem>
+      <DropdownItem on:click={() => (settingsOpen = true)}>
+        Settings
+      </DropdownItem>
       <DropdownDivider
         divClass="my-1 h-px bg-gray-200/80 dark:bg-gray-700/40"
       />
@@ -158,9 +197,6 @@
     <div class="flex justify-between">
       <div class="flex space-x-2">
         <CustomButton click={loadDevices}>Reload</CustomButton>
-        <CustomButton click={() => getModal('info-modal').open()}>
-          <PlusIcon slot="icon" class="me-1" /> Devices
-        </CustomButton>
       </div>
     </div>
     <h1 class="text-2xl font-bold mt-5">Lights</h1>
@@ -178,7 +214,7 @@
     </div>
 
     <SpeedDial defaultClass="absolute right-6 bottom-6" color="primary">
-      <SpeedDialButton name="Add&nbsp;Hue" on:click={addHue}>
+      <SpeedDialButton name="Add&nbsp;Hue" on:click={() => (addHueOpen = true)}>
         <PlusIcon class="w-6 h-6" />
       </SpeedDialButton>
       <SpeedDialButton name="Add&nbsp;Wled">
@@ -231,11 +267,5 @@
   </Footer>
 </div>
 
-<Modal id="info-modal">
-  <h1 slot="header" class="text-xl font-bold select-none">Add Devices</h1>
-  <div class="mt-5 items-start">
-    <div class="flex flex-col justify-center items-center">
-      <CustomButton click={addHue}>Hue</CustomButton>
-    </div>
-  </div>
-</Modal>
+<Settings bind:open={settingsOpen} />
+<AddHue bind:open={addHueOpen} />
