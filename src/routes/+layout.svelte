@@ -132,8 +132,8 @@
     navClass="p-3 !bg-white/80 dark:!bg-gray-700/80 backdrop-blur-md"
     navDivClass="mx-auto flex flex-wrap justify-between items-center container"
   >
-    <NavBrand href="/" class="text-xl font-normal">
-      <img src="/vite.svg" alt="logo" class="h-8 w-8 inline-block me-2" />
+    <NavBrand href="/static/" class="text-xl font-normal">
+      <img src="/static/vite.svg" alt="logo" class="h-8 w-8 inline-block me-2" />
       <span class="text-primary font-bold">Home</span>Api
     </NavBrand>
     <div class="flex items-center md:order-2">

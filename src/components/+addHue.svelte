@@ -14,9 +14,9 @@
     initHueBridge,
   } from '../api'
   import { bridgeStore } from '../stores'
+  import LoadingButton from './+loadingButton.svelte'
 
   let autimaticallyInitialize = true
-  let loading = false
   let errorMessage = ''
   let ip = ''
 
@@ -26,18 +26,12 @@
     errorMessage = ''
     ip = ''
     autimaticallyInitialize = true
-    loading = false
-  }
-
-  $: if (loading) {
-    errorMessage = ''
   }
 
   async function addBridge(event: Event) {
     event.preventDefault()
 
-    if (loading) return
-    loading = true
+    errorMessage = ''
 
     const added = await addHueBridge(ip).catch(() => false)
 
@@ -52,12 +46,10 @@
       } else {
         await deleteHueBridge(added.id)
         errorMessage = init.message
-        loading = false
         return
       }
     } else if (added.message) {
       errorMessage = added.message
-      loading = false
       return
     }
     open = false
@@ -87,19 +79,13 @@
     {#if errorMessage}
       <p class="text-red-500">{errorMessage}</p>
     {/if}
-    <Button
-      disabled={loading || ip === ''}
+    <LoadingButton
+      disabled={ip === ''}
       type="submit"
-      class="w-full1"
-      on:click={addBridge}
+      buttonClass="w-full1"
+      asyncFunction={addBridge}
     >
       Add Hue Bridge{' '}
-      {#if loading}
-        <Spinner
-          class="ml-2 !text-black/20 !fill-black dark:!text-white/20 dark:!fill-white"
-          size="5"
-        />
-      {/if}
-    </Button>
+    </LoadingButton>
   </form>
 </Modal>

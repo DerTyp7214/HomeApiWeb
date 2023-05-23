@@ -99,20 +99,22 @@
         on:submit|preventDefault={submitSignup}
       >
         <h1 class="text-2xl font-bold">Signup</h1>
-        <Input
-          class="w-10/12 lg:w-1/2 2xl:w-1/3 m-2"
-          name="username"
-          color={errorMessage ? 'red' : 'base'}
-          placeholder="Username"
-        />
-        <Input
-          class="w-10/12 lg:w-1/2 2xl:w-1/3 m-2"
-          name="email"
-          color={errorMessage ? 'red' : 'base'}
-          id="email"
-          type="email"
-          placeholder="Email"
-        />
+        <div class="w-10/12 lg:w-1/2 2xl:w-1/3 m-2">
+          <Input
+            name="username"
+            color={errorMessage ? 'red' : 'base'}
+            placeholder="Username"
+          />
+        </div>
+        <div class="w-10/12 lg:w-1/2 2xl:w-1/3 m-2">
+          <Input
+            name="email"
+            color={errorMessage ? 'red' : 'base'}
+            id="email"
+            type="email"
+            placeholder="Email"
+          />
+        </div>
         <div class="w-10/12 lg:w-1/2 2xl:w-1/3 m-2">
           <Input
             name="password"
@@ -222,8 +224,6 @@
     {:else}
       <h1 class="text-2xl font-bold">Loading...</h1>
     {/if}
-  {:else}
-    <h1 class="text-2xl font-bold">Something went wrong!</h1>
   {/if}
 </main>
 

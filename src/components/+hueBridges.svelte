@@ -15,6 +15,7 @@
   } from 'flowbite-svelte'
   import { deleteHueBridge, getHueBridges, initHueBridge } from '../api'
   import { bridgeStore } from '../stores'
+  import LoadingButton from './+loadingButton.svelte'
 
   let inputValue = ''
   let bridges: HueBridge[] = []
@@ -105,14 +106,14 @@
           {#if bridge.user}
             {bridge.user}
           {:else}
-            <Button
+            <LoadingButton
               id="init-{bridge.id}"
               color={initErrors[bridge.id] ? 'red' : 'dark'}
               disabled={loading}
-              on:click={() => initBridge(bridge.id)}
+              asyncFunction={async () => await initBridge(bridge.id)}
             >
               Initialize
-            </Button>
+            </LoadingButton>
             {#if initErrors[bridge.id]}
               <Popover open>{initErrors[bridge.id]}</Popover>
             {/if}

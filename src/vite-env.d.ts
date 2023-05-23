@@ -50,3 +50,16 @@ type HueBridge = {
   ip: string
   user: string
 }
+
+type ElementColor =
+  | 'red'
+  | 'yellow'
+  | 'green'
+  | 'purple'
+  | 'blue'
+  | 'light'
+  | 'dark'
+  | 'primary'
+  | 'none'
+  | 'alternative'
+  | undefined
