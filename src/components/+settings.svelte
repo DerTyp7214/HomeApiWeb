@@ -9,7 +9,6 @@
     SidebarWrapper,
   } from 'flowbite-svelte'
   import { userStore } from '../stores'
-  import type { User } from '../types'
   import UserSettings from './+userSettings.svelte'
   import HueBridges from './+hueBridges.svelte'
 
@@ -41,7 +40,7 @@
   <Heading class="text-[40px] font-normal">Settings</Heading>
   <DropdownDivider />
   <div class="flex flex-row max-w-full w-[80vw] h-[40vh]">
-    <Sidebar>
+    <Sidebar asideClass="w-64 customSidebar">
       <SidebarWrapper>
         <SidebarGroup>
           <SidebarItem

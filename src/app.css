@@ -70,3 +70,23 @@ body,
   padding-left: 0.5rem;
   padding-top: 0.75rem;
 }
+
+#smart-device > div {
+  background: linear-gradient(
+    135deg,
+    var(--color-light) 0%,
+    color-mix(in xyz, var(--color-light) 20%, white) 100%
+  );
+}
+
+:is(.dark #smart-device > div) {
+  background: linear-gradient(
+    135deg,
+    var(--color-dark) 0%,
+    color-mix(in xyz, var(--color-dark) 20%, #1d1f24) 100%
+  );
+}
+
+.customSidebar > div {
+  background: transparent;
+}

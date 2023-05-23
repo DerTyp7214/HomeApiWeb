@@ -13,10 +13,7 @@
     logout,
     getProfilePicture,
   } from '../api'
-  import LightElement from '../components/+lightElement.svelte'
-  import PlugElement from '../components/+plugElement.svelte'
   import CustomButton from '../components/+customButton.svelte'
-  import type { User } from '../types'
   import {
     Avatar,
     DarkMode,
@@ -40,6 +37,7 @@
   import Settings from '../components/+settings.svelte'
   import { bridgeStore, lightsStore, plugsStore, userStore } from '../stores'
   import AddHue from '../components/+addHue.svelte'
+  import SmartDevice from '../components/+smartDevice.svelte'
 
   let lights: { [key: string]: Light } = {}
   let plugs: { [key: string]: Plug } = {}
@@ -202,14 +200,14 @@
     <h1 class="text-2xl font-bold mt-5">Lights</h1>
     <div class="inline-flex flex-wrap justify-start mt-3">
       {#each Object.entries(lights) as [_, light]}
-        <LightElement {light} />
+        <SmartDevice device={light} />
       {/each}
     </div>
 
     <h1 class="text-2xl font-bold mt-5">Plugs</h1>
     <div class="inline-flex justify-around mt-3">
       {#each Object.entries(plugs) as [_, plug]}
-        <PlugElement {plug} />
+        <SmartDevice device={plug} />
       {/each}
     </div>
 

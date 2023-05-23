@@ -5,7 +5,6 @@
   import { checkApiUrl, me, login, signup } from './api'
   import Layout from './routes/+layout.svelte'
   import { userStore } from './stores'
-  import type { User } from './types'
   import {
     Button,
     DarkMode,

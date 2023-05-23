@@ -9,6 +9,12 @@ export const changeLightnessOfRgb = (rgb: number[], amount: number) => {
   return color.lightness(amount * 100).hex()
 }
 
+export const lerpColor = (a: string, b: string, weight: number) => {
+  const colorA = Color(a)
+  const colorB = Color(b)
+  return colorA.mix(colorB, weight).hexa()
+}
+
 export const filePicker = async (accept: string): Promise<File> => {
   return new Promise<File>((resolve, reject) => {
     const input = document.createElement('input')

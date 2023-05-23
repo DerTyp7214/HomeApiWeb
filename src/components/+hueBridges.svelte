@@ -14,7 +14,6 @@
     TableSearch,
   } from 'flowbite-svelte'
   import { deleteHueBridge, getHueBridges, initHueBridge } from '../api'
-  import type { HueBridge } from '../types'
   import { bridgeStore } from '../stores'
 
   let inputValue = ''

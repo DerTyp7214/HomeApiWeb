@@ -4,7 +4,6 @@
   import { Avatar, Spinner, ButtonGroup, Button } from 'flowbite-svelte'
   import { setProfilePicture } from '../api'
   import { userStore } from '../stores'
-  import type { User } from '../types'
   import { filePicker } from '../utils'
 
   let user: User

@@ -38,3 +38,15 @@ type LightInput = {
 type PlugInput = {
   on?: boolean
 }
+
+type User = {
+  username: string
+  email: string
+  profilePicture?: string
+}
+
+type HueBridge = {
+  id: string
+  ip: string
+  user: string
+}
