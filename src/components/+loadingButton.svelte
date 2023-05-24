@@ -6,12 +6,11 @@
   export let asyncFunction: (event: Event) => Promise<any> = async () => {}
   export let id: string = null
   export let disabled: boolean = false
+  export let loading: boolean = false
   export let color: ElementColor = "primary"
   export let type: ButtonType = null
   export let buttonProps: ButtonProps = {}
   export let buttonClass: string = ""
-
-  let loading = false
 
   async function run(event: Event) {
     loading = true

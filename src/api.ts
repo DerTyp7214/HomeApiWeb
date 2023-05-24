@@ -23,7 +23,7 @@ export const checkApiUrl = async (count: number = 0) => {
     return false
   }
   try {
-    const res = await fetch(`${_apiUrl}/status`).then((res) => res.json())
+    const res = await status().catch(() => ({ status: 'ERROR' }))
     if (res.status === 'OK') {
       if (count > 0) {
         location.reload()
@@ -35,6 +35,18 @@ export const checkApiUrl = async (count: number = 0) => {
   }
   setApiUrl(prompt('API URL', _apiUrl))
   return checkApiUrl(count + 1)
+}
+
+export const status = async () => {
+  try {
+    const res = await fetch(`${_apiUrl}/status`)
+    if (res.status === 200) {
+      return await res.json()
+    }
+  } catch (e) {
+    console.error(e)
+  }
+  throw new Error('Failed to fetch status')
 }
 
 export const me = async () => {
@@ -68,13 +80,13 @@ export const signup = async (
     },
     body: JSON.stringify({ username, email, password }),
   })
-  if (res.ok) {
-    const { access_token } = await res.json()
-    setJWT(access_token)
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    setJWT(json.access_token)
     await me()
-    return true
+    return json
   }
-  throw new Error('Failed to signup')
+  throw new Error(json.message ?? 'Failed to signup')
 }
 
 export const login = async (email: string, password: string) => {
@@ -85,13 +97,13 @@ export const login = async (email: string, password: string) => {
     },
     body: JSON.stringify({ email, password }),
   })
-  if (res.ok) {
-    const { access_token } = await res.json()
-    setJWT(access_token)
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    setJWT(json.access_token)
     await me()
-    return true
+    return json
   }
-  throw new Error('Failed to login')
+  throw new Error(json.message ?? 'Failed to login')
 }
 
 export const logout = async () => {
@@ -106,10 +118,11 @@ export const getLights = async () => {
       Authorization: `Bearer ${_jwt}`,
     },
   })
-  if (res.ok) {
-    return res.json()
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   }
-  throw new Error('Failed to fetch lights')
+  throw new Error(json.message ?? 'Failed to fetch lights')
 }
 
 export const getPlugs = async () => {
@@ -118,10 +131,11 @@ export const getPlugs = async () => {
       Authorization: `Bearer ${_jwt}`,
     },
   })
-  if (res.ok) {
-    return res.json()
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   }
-  throw new Error('Failed to fetch plugs')
+  throw new Error(json.message ?? 'Failed to fetch plugs')
 }
 
 export const getLight = async (id: string) => {
@@ -130,10 +144,11 @@ export const getLight = async (id: string) => {
       Authorization: `Bearer ${_jwt}`,
     },
   })
-  if (res.ok) {
-    return res.json()
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   }
-  throw new Error('Failed to fetch light')
+  throw new Error(json.message ?? 'Failed to fetch light')
 }
 
 export const getPlug = async (id: string) => {
@@ -142,10 +157,11 @@ export const getPlug = async (id: string) => {
       Authorization: `Bearer ${_jwt}`,
     },
   })
-  if (res.ok) {
-    return res.json()
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   }
-  throw new Error('Failed to fetch plug')
+  throw new Error(json.message ?? 'Failed to fetch plug')
 }
 
 export const setLight = async (id: string, state: LightInput) => {
@@ -157,10 +173,11 @@ export const setLight = async (id: string, state: LightInput) => {
     },
     body: JSON.stringify(state),
   })
-  if (res.ok) {
-    return res.json()
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   }
-  throw new Error('Failed to set light')
+  throw new Error(json.message ?? 'Failed to set light')
 }
 
 export const setPlug = async (id: string, state: PlugInput) => {
@@ -172,10 +189,11 @@ export const setPlug = async (id: string, state: PlugInput) => {
     },
     body: JSON.stringify(state),
   })
-  if (res.ok) {
-    return res.json()
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   }
-  throw new Error('Failed to set plug')
+  throw new Error(json.message ?? 'Failed to set plug')
 }
 
 export const addHueBridge = async (ip: string) => {
@@ -188,12 +206,11 @@ export const addHueBridge = async (ip: string) => {
     },
     body: JSON.stringify({ host: ip }),
   })
-  if (res.ok) {
-    return await res.json()
-  } else if (res.status === 409) {
-    return await res.json()
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   }
-  throw new Error('Failed to set config')
+  throw new Error(json.message ?? 'Failed to add config')
 }
 
 export const deleteHueBridge = async (bridgeId: string) => {
@@ -204,10 +221,11 @@ export const deleteHueBridge = async (bridgeId: string) => {
       'Content-Type': 'application/json',
     },
   })
-  if (res.ok) {
-    return true
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   }
-  throw new Error('Failed to delete config')
+  throw new Error(json.message ?? 'Failed to delete config')
 }
 
 export const initHueBridge = async (bridgeId: string) => {
@@ -218,14 +236,15 @@ export const initHueBridge = async (bridgeId: string) => {
       'Content-Type': 'application/json',
     },
   })
-  if (res.ok) {
-    return res.json()
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   } else if (res.status === 401) {
-    return await res.json()
+    return json
   } else if (res.status === 500) {
-    return await res.json()
+    return json
   }
-  throw new Error('Failed to init hue')
+  throw new Error(json.message ?? 'Failed to init bridge')
 }
 
 export const setProfilePicture = async (file: File) => {
@@ -236,10 +255,11 @@ export const setProfilePicture = async (file: File) => {
     },
     body: file,
   })
-  if (res.ok) {
-    return true
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json
   }
-  throw new Error('Failed to set profile picture')
+  throw new Error(json.message ?? 'Failed to set profile picture')
 }
 
 export const getProfilePicture = async () => {
@@ -251,7 +271,8 @@ export const getProfilePicture = async () => {
   if (res.ok) {
     return res.blob()
   }
-  throw new Error('Failed to get profile picture')
+  const json = await res.json().catch(() => ({}))
+  throw new Error(json.message ?? 'Failed to get profile picture')
 }
 
 export const getHueBridges = async () => {
@@ -260,10 +281,11 @@ export const getHueBridges = async () => {
       Authorization: `Bearer ${_jwt}`,
     },
   })
-  if (res.ok) {
-    return res.json()
+  const json = await res.json().catch(() => ({}))
+  if (res.status === 200) {
+    return json as HueBridge[]
   }
-  throw new Error('Failed to get hue bridges')
+  throw new Error(json.message ?? 'Failed to fetch bridges')
 }
 
 export const connectWebSocket = () => {

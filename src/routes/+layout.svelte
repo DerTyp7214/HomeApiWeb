@@ -68,10 +68,11 @@
   })
 
   async function loadDevices() {
-    const lightsData = await getLights()
+    const [lightsData, plugsData] = await Promise.all([
+      getLights(),
+      getPlugs(),
+    ]).catch(() => [[], []])
     lightsStore.set(lightsData)
-
-    const plugsData = await getPlugs()
     plugsStore.set(plugsData)
   }
 
@@ -133,7 +134,11 @@
     navDivClass="mx-auto flex flex-wrap justify-between items-center container"
   >
     <NavBrand href="/static/" class="text-xl font-normal">
-      <img src="/static/vite.svg" alt="logo" class="h-8 w-8 inline-block me-2" />
+      <img
+        src="/static/vite.svg"
+        alt="logo"
+        class="h-8 w-8 inline-block me-2"
+      />
       <span class="text-primary font-bold">Home</span>Api
     </NavBrand>
     <div class="flex items-center md:order-2">
