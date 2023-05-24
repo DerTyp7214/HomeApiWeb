@@ -2,6 +2,7 @@
   import PlusIcon from 'svelte-material-icons/Plus.svelte'
   import GitHubIcon from 'svelte-material-icons/Github.svelte'
   import TwitterIcon from 'svelte-material-icons/Twitter.svelte'
+  import GestureTapBoxIcon from 'svelte-material-icons/GestureTapBox.svelte'
 
   import {
     connectWebSocket,
@@ -218,7 +219,7 @@
 
     <SpeedDial defaultClass="absolute right-6 bottom-6" color="primary">
       <SpeedDialButton name="Add&nbsp;Hue" on:click={() => (addHueOpen = true)}>
-        <PlusIcon class="w-6 h-6" />
+        <GestureTapBoxIcon class="w-6 h-6" />
       </SpeedDialButton>
       <SpeedDialButton name="Add&nbsp;Wled">
         <PlusIcon class="w-6 h-6" />

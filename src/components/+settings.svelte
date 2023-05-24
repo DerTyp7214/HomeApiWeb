@@ -1,4 +1,7 @@
 <script lang="ts">
+  import UserIcon from 'svelte-material-icons/AccountOutline.svelte'
+  import GestureTapBoxIcon from 'svelte-material-icons/GestureTapBox.svelte'
+
   import {
     DropdownDivider,
     Heading,
@@ -53,7 +56,11 @@
               } else return
             }}
             active={activeItem === 'UserSettings'}
-          />
+          >
+            <svelte:fragment slot="icon">
+              <UserIcon size="24" />
+            </svelte:fragment>
+          </SidebarItem>
           <SidebarItem
             label="Hue Bridges"
             on:click={(event) => {
@@ -64,7 +71,11 @@
               } else return
             }}
             active={activeItem === 'HueBridges'}
-          />
+          >
+            <svelte:fragment slot="icon">
+              <GestureTapBoxIcon size="24" />
+            </svelte:fragment>
+          </SidebarItem>
         </SidebarGroup>
       </SidebarWrapper>
     </Sidebar>
