@@ -31,8 +31,7 @@
 	$: lerpFactor = device.on ? 0.8 : 0.25;
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<div
+<button
 	style="--color: {color}; --color-dark: {lerpColor(
 		color,
 		'#1d1f24',
@@ -56,4 +55,4 @@
 			</h5>
 		</div>
 	</div>
-</div>
+</button>

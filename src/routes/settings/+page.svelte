@@ -23,6 +23,12 @@
 	$: positionClasses = $drawerStore.open ? 'translate-x-[20%]' : '';
 
 	let drawerSettings: DrawerSettings;
+
+	window.addEventListener('popstate', () => {
+		currentPage = window.location.hash.replace('#', '');
+		currentPage =
+			currentPage === '' ? pages[0]?.toLowerCase() ?? '' : currentPage;
+	});
 </script>
 
 {#if $user}
@@ -31,10 +37,10 @@
 			<h1 class="my-2 w-full text-center text-2xl font-bold">Settings</h1>
 			{#each pages as page}
 				<button
-					class="my-1 ml-2 mr-2 rounded-full py-2 pl-5 text-left transition-colors {currentPage ===
+					class="btn my-1 ml-2 mr-2 justify-start transition-colors {currentPage ===
 					page.toLowerCase()
-						? 'bg-primary-500'
-						: 'hover:bg-primary-500/50'}"
+						? 'bg-primary-active-token'
+						: 'hover:bg-primary-500/50 hover:text-on-primary-token'}"
 					on:click={() => {
 						window.location.hash = page.toLowerCase();
 						currentPage = page.toLowerCase();
@@ -57,25 +63,13 @@
 				backIfAvailable
 			/>
 		</svelte:fragment>
-		<div class="h-full w-full p-4">
+		<div class="h-full w-full p-2">
 			<div
-				class="card relative h-full w-full !bg-surface-200/50 dark:!bg-surface-800/50"
+				class="card relative h-full w-full !bg-surface-200-700-token/60 dark:!bg-surface-800/60"
 			>
 				<Navigator {currentPage} bind:drawerSettings>
 					<ProfileSettings />
 					<HueBridgesSettings />
-					<div id="account">
-						<h1 class="text-2xl font-bold">Account</h1>
-						<p class="text-lg">Account settings</p>
-					</div>
-					<div id="about">
-						<h1 class="text-2xl font-bold">About</h1>
-						<p class="text-lg">About settings</p>
-					</div>
-					<div id="yeet">
-						<h1 class="text-2xl font-bold">Yeet</h1>
-						<p class="text-lg">Yeet settings</p>
-					</div>
 				</Navigator>
 			</div>
 		</div>

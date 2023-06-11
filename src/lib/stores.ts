@@ -8,3 +8,8 @@ export const bridgeStore: Writable<HueBridge[]> = localStorageStore(
 	'bridges',
 	[]
 );
+
+export const pageThemeStore: Writable<ThemeName> = localStorageStore(
+	'pageTheme',
+	'skeleton'
+);

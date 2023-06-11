@@ -52,7 +52,8 @@
 					<ProgressRadial
 						meter="stroke-warning-500"
 						track="stroke-warning-500/30"
-						class="!absolute left-1/2 top-1/2 h-2/3 w-2/3 -translate-x-1/2 -translate-y-1/2"
+						width="w-2/3"
+						class="!absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
 					/>
 				{/if}
 			</button>

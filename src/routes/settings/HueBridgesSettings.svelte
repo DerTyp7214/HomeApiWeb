@@ -6,7 +6,7 @@
 	import { deleteHueBridge, getHueBridges, initHueBridge } from '$lib/api';
 	import LoadingButton from '$lib/components/LoadingButton.svelte';
 	import { bridgeStore, userStore as user } from '$lib/stores';
-	import { Toast, popup, storePopup, toastStore } from '@skeletonlabs/skeleton';
+	import { Toast, toastStore } from '@skeletonlabs/skeleton';
 
 	let inputValue = '';
 	let bridges: HueBridge[] = [];
@@ -106,7 +106,7 @@
 									{bridge.user}
 								{:else}
 									<LoadingButton
-										buttonClass="bg-primary-500 text-white dark:text-black rounded-full p-2 px-4 transition-colors hover:bg-primary-600 dark:bg-primary-400 dark:hover:bg-primary-300"
+										class="rounded-full p-2 px-4 transition-colors bg-primary-500-400-token text-on-primary-token hover:bg-primary-600-300-token"
 										{loading}
 										asyncFunction={async () => await initBridge(bridge.id)}
 									>
@@ -143,13 +143,13 @@
 		</div>
 		<div class="alert-actions">
 			<LoadingButton
-				buttonClass="rounded-full bg-surface-100 p-4 py-2 transition-colors hover:bg-surface-200 dark:bg-surface-900 dark:hover:bg-surface-800"
+				class="hover:bg-surface-200-800-token base-round p-4 py-2 transition-colors bg-surface-50-900-token"
 				asyncFunction={async () => await deleteBridge(bridgeToDelete?.id)}
 			>
 				Delete
 			</LoadingButton>
 			<button
-				class="rounded-full bg-surface-100 p-4 py-2 transition-colors hover:bg-surface-200 dark:bg-surface-900 dark:hover:bg-surface-800"
+				class="hover:bg-surface-200-800-token base-round p-4 py-2 transition-colors bg-surface-50-900-token"
 				on:click={() => (bridgeToDelete = undefined)}
 			>
 				Cancel

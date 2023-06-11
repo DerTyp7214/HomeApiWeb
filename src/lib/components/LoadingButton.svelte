@@ -1,9 +1,5 @@
 <script lang="ts">
-	import {
-		ProgressRadial,
-		popup,
-		type PopupSettings,
-	} from '@skeletonlabs/skeleton';
+	import { ProgressRadial } from '@skeletonlabs/skeleton';
 	import type { HTMLButtonAttributes } from 'svelte/elements/index';
 
 	export let asyncFunction: (event: Event) => Promise<any> = async () => {};
@@ -11,8 +7,9 @@
 	export let disabled: boolean = false;
 	export let loading: boolean = false;
 	export let color: ElementColor = 'primary';
-	export let buttonClass: string = '';
 	export let type: HTMLButtonAttributes['type'] = 'button';
+
+	let buttonClass = $$props.class;
 
 	async function run(event: Event) {
 		loading = true;

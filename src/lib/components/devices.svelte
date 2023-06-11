@@ -3,15 +3,7 @@
 	import RefreshIcon from 'svelte-material-icons/Refresh.svelte';
 
 	import SmartDevice from '$lib/components/SmartDevice.svelte';
-	import {
-		addHueBridge,
-		connectWebSocket,
-		deleteHueBridge,
-		getHueBridges,
-		getLights,
-		getPlugs,
-		initHueBridge,
-	} from '$lib/api';
+	import { connectWebSocket, getLights, getPlugs } from '$lib/api';
 	import { bridgeStore, lightsStore, plugsStore } from '$lib/stores';
 	import LoadingButton from './LoadingButton.svelte';
 	import {
@@ -118,7 +110,7 @@
 </div>
 
 <LoadingButton
-	buttonClass="fab absolute right-8 top-8 !p-3"
+	class="fab absolute right-8 top-8 !p-3"
 	asyncFunction={loadDevices}
 >
 	<RefreshIcon size="18px" />
@@ -128,7 +120,7 @@
 	<PlusIcon size="24px" />
 </button>
 
-<div class="card w-48 py-2 shadow-xl" data-popup="popupCombobox">
+<div class="card w-48 py-2 shadow-xl overflow-hidden" data-popup="popupCombobox">
 	<ListBox rounded="rounded-none">
 		<!--<ListBoxItem bind:group={comboboxValue} name="medium" value="wled">
 			W-Led

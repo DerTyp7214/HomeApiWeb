@@ -97,7 +97,7 @@
         <button class="btn {parent.buttonNeutral}" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
         <LoadingButton
 			disabled={hostname.trim().length === 0}
-			buttonClass="btn {parent.buttonPositive}"
+			class="btn {parent.buttonPositive}"
 			asyncFunction={submit}>
 			{parent.buttonTextSubmit ?? 'Submit Form'}
 		</LoadingButton>

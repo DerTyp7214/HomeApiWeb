@@ -4,7 +4,7 @@
 </script>
 
 <div
-	class="m-2 flex flex-col gap-2 rounded-xl bg-surface-200 p-3 dark:bg-surface-800"
+	class="container-round bg-surface-200-700-token m-2 flex flex-col gap-2 p-3"
 >
 	<div class="sm:flex sm:items-center sm:justify-between">
 		<div class="flex justify-center text-base text-gray-500 dark:text-gray-400">

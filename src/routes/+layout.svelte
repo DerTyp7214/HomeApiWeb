@@ -1,4 +1,8 @@
 <script lang="ts">
+	import '@skeletonlabs/skeleton/styles/skeleton.css';
+
+	import '../app.css';
+
 	import HideIcon from 'svelte-material-icons/EyeOff.svelte';
 	import ShowIcon from 'svelte-material-icons/Eye.svelte';
 
@@ -11,21 +15,18 @@
 		arrow,
 	} from '@floating-ui/dom';
 
-	import '@skeletonlabs/skeleton/themes/theme-skeleton.css';
-	import '@skeletonlabs/skeleton/styles/skeleton.css';
-
-	import '../app.css';
-
 	import {
 		LightSwitch,
 		ProgressRadial,
 		storePopup,
 	} from '@skeletonlabs/skeleton';
+
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
 	import { checkApiUrl, login, me, signup } from '$lib/api';
-	import { userStore } from '$lib/stores';
+	import { pageThemeStore, userStore } from '$lib/stores';
 	import LoadingButton from '$lib/components/LoadingButton.svelte';
+	import { setTheme } from '$lib/utils';
 
 	let loading = true;
 	let connected = false;
@@ -37,6 +38,8 @@
 	let authorized = false;
 	let unauthorized = false;
 	let errorMessage: string | null = null;
+
+	setTheme($pageThemeStore);
 
 	checkApiUrl()
 		.then(async () => {
@@ -178,7 +181,7 @@
 					<p class="text-red-500">{errorMessage}</p>
 				{/if}
 				<LoadingButton
-					buttonClass="m-2 w-10/12 p-2 outline-none lg:w-1/2 2xl:w-1/3 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-full"
+					class="m-2 w-10/12 rounded-full bg-primary-500 p-2 font-bold text-white outline-none hover:bg-primary-600 lg:w-1/2 2xl:w-1/3"
 					type="submit"
 					{loading}
 				>
@@ -237,7 +240,7 @@
 					<p class="text-red-500">{errorMessage}</p>
 				{/if}
 				<LoadingButton
-					buttonClass="m-2 w-10/12 p-2 outline-none lg:w-1/2 2xl:w-1/3 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-full"
+					class="m-2 w-10/12 rounded-full bg-primary-500 p-2 font-bold text-white outline-none hover:bg-primary-600 lg:w-1/2 2xl:w-1/3"
 					type="submit"
 					{loading}
 				>

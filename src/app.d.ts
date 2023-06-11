@@ -70,3 +70,14 @@ type ElementColor =
 	| 'none'
 	| 'alternative'
 	| undefined;
+
+type ThemeName =
+	| 'skeleton'
+	| 'modern'
+	| 'rocket'
+	| 'seafoam'
+	| 'vintage'
+	| 'sahara'
+	| 'hamlindigo'
+	| 'gold-nouveau'
+	| 'crimson';
