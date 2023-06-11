@@ -1,275 +1,267 @@
 <script lang="ts">
-  import PlusIcon from 'svelte-material-icons/Plus.svelte'
-  import GitHubIcon from 'svelte-material-icons/Github.svelte'
-  import TwitterIcon from 'svelte-material-icons/Twitter.svelte'
-  import GestureTapBoxIcon from 'svelte-material-icons/GestureTapBox.svelte'
+	import HideIcon from 'svelte-material-icons/EyeOff.svelte';
+	import ShowIcon from 'svelte-material-icons/Eye.svelte';
 
-  import {
-    connectWebSocket,
-    getLights,
-    getPlugs,
-    addHueBridge,
-    initHueBridge,
-    deleteHueBridge,
-    logout,
-    getProfilePicture,
-  } from '../api'
-  import CustomButton from '../components/+customButton.svelte'
-  import {
-    Avatar,
-    DarkMode,
-    Dropdown,
-    DropdownDivider,
-    DropdownHeader,
-    DropdownItem,
-    Footer,
-    FooterCopyright,
-    FooterIcon,
-    FooterLink,
-    FooterLinkGroup,
-    NavBrand,
-    NavHamburger,
-    NavLi,
-    NavUl,
-    Navbar,
-    SpeedDial,
-    SpeedDialButton,
-  } from 'flowbite-svelte'
-  import Settings from '../components/+settings.svelte'
-  import { bridgeStore, lightsStore, plugsStore, userStore } from '../stores'
-  import AddHue from '../components/+addHue.svelte'
-  import SmartDevice from '../components/+smartDevice.svelte'
+	import {
+		computePosition,
+		autoUpdate,
+		offset,
+		shift,
+		flip,
+		arrow,
+	} from '@floating-ui/dom';
 
-  let lights: { [key: string]: Light } = {}
-  let plugs: { [key: string]: Plug } = {}
+	import '@skeletonlabs/skeleton/themes/theme-skeleton.css';
+	import '@skeletonlabs/skeleton/styles/skeleton.css';
 
-  export let user: User
+	import '../app.css';
 
-  let settingsOpen = false
-  let addHueOpen = false
+	import {
+		LightSwitch,
+		ProgressRadial,
+		storePopup,
+	} from '@skeletonlabs/skeleton';
+	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
-  lightsStore.subscribe((value) => {
-    lights = {}
-    value.forEach((light) => {
-      lights[light.id] = light
-    })
-  })
+	import { checkApiUrl, login, me, signup } from '$lib/api';
+	import { userStore } from '$lib/stores';
+	import LoadingButton from '$lib/components/LoadingButton.svelte';
 
-  plugsStore.subscribe((value) => {
-    plugs = {}
-    value.forEach((plug) => {
-      plugs[plug.id] = plug
-    })
-  })
+	let loading = true;
+	let connected = false;
+	let error = false;
 
-  bridgeStore.subscribe((value) => {
-    if (value) {
-      loadDevices()
-    }
-  })
+	let doSignup = true;
+	let showPassword = false;
 
-  async function loadDevices() {
-    const [lightsData, plugsData] = await Promise.all([
-      getLights(),
-      getPlugs(),
-    ]).catch(() => [[], []])
-    lightsStore.set(lightsData)
-    plugsStore.set(plugsData)
-  }
+	let authorized = false;
+	let unauthorized = false;
+	let errorMessage: string | null = null;
 
-  const ws = connectWebSocket()
+	checkApiUrl()
+		.then(async () => {
+			await me().catch(() => {
+				userStore.set(undefined);
+			});
+			connected = true;
+			loading = false;
+		})
+		.catch(() => {
+			error = true;
+			loading = false;
+		});
 
-  ws.addEventListener('message', (event) => {
-    const { type, data } = JSON.parse(event.data)
+	$: {
+		if ($userStore) {
+			authorized = true;
+			unauthorized = false;
+			errorMessage = null;
+		} else {
+			authorized = false;
+			unauthorized = true;
+		}
+	}
 
-    if (!data) {
-      loadDevices()
-      return
-    }
+	async function submitLogin(event: SubmitEvent) {
+		loading = true;
 
-    switch (type) {
-      case 'light':
-        lights[data.id] = data
-        break
-      case 'plug':
-        plugs[data.id] = data
-        break
-    }
-  })
+		const form = event.target as HTMLFormElement;
+		const email = form.email.value;
+		const password = form.password.value;
 
-  getProfilePicture().then((picture) => {
-    const profilePicture = URL.createObjectURL(picture)
-    userStore.update((user) => ({ ...user, profilePicture }))
-  })
+		await login(email, password).catch((message: Error) => {
+			userStore.set(undefined);
+			errorMessage = message.message;
+		});
 
-  async function addHue() {
-    const ip = prompt(
-      'Enter the IP of your Hue Bridge, press the button and click OK'
-    )
-    const config = await addHueBridge(ip).catch(() => null)
+		loading = false;
+	}
 
-    if (config) {
-      const init = await initHueBridge(config.id)
-        .then(() => true)
-        .catch(() => false)
+	async function submitSignup(event: SubmitEvent) {
+		loading = true;
 
-      if (init) {
-        loadDevices()
-        return
-      } else {
-        await deleteHueBridge(config.id)
-      }
-    }
-    alert('Something went wrong')
-  }
+		const form = event.target as HTMLFormElement;
+		const username = form.username.value;
+		const email = form.email.value;
+		const password = form.password.value;
+		const password_confirmation = form.password_confirmation.value;
 
-  loadDevices()
+		if (password !== password_confirmation) {
+			errorMessage = 'Passwords do not match';
+			return;
+		}
+
+		await signup(username, email, password).catch((message: Error) => {
+			userStore.set(undefined);
+			errorMessage = message.message;
+		});
+
+		loading = false;
+	}
 </script>
 
-<div class="fixed w-full p-4 top-0 left-0 z-30">
-  <Navbar
-    let:hidden
-    let:toggle
-    rounded
-    navClass="p-3 !bg-white/80 dark:!bg-gray-700/80 backdrop-blur-md"
-    navDivClass="mx-auto flex flex-wrap justify-between items-center container"
-  >
-    <NavBrand href="/static/" class="text-xl font-normal">
-      <img
-        src="/static/vite.svg"
-        alt="logo"
-        class="h-8 w-8 inline-block me-2"
-      />
-      <span class="text-primary font-bold">Home</span>Api
-    </NavBrand>
-    <div class="flex items-center md:order-2">
-      <DarkMode
-        btnClass="text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-lg text-sm p-2.5 mr-2"
-      />
-      <Avatar id="avatar-menu" class="cursor-pointer overflow-hidden">
-        {#if user.profilePicture}
-          <img
-            src={user.profilePicture}
-            alt="profile"
-            class="w-full h-full pointer-events-none"
-          />
-        {:else}
-          <svg
-            class="text-gray-400 bg-gray-100 dark:bg-gray-600 rounded-full"
-            fill="currentColor"
-            viewBox="0 0 16 16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M8 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        {/if}
-      </Avatar>
-      <NavHamburger
-        on:click={toggle}
-        class1="w-full md:flex md:w-auto md:order-1"
-      />
-    </div>
-    <Dropdown placement="bottom" triggeredBy="#avatar-menu" color="navbar">
-      <DropdownHeader divider={false}>
-        <spin class="block text-sm">{user.username}</spin>
-        <span class="block truncate text-sm font-medium">{user.email}</span>
-      </DropdownHeader>
-      <DropdownDivider
-        divClass="my-1 h-px bg-gray-200/80 dark:bg-gray-700/40"
-      />
-      <DropdownItem on:click={() => (settingsOpen = true)}>
-        Settings
-      </DropdownItem>
-      <DropdownDivider
-        divClass="my-1 h-px bg-gray-200/80 dark:bg-gray-700/40"
-      />
-      <DropdownItem on:click={logout}>Logout</DropdownItem>
-    </Dropdown>
-    <NavUl {hidden}>
-      <NavLi href="/static/" active={true}>Home</NavLi>
-      <NavLi href="/static/about">About</NavLi>
-    </NavUl>
-  </Navbar>
-</div>
-
-<div class="p-4 h-full flex flex-col overflow-auto layout-content">
-  <div class="flex-grow mt-24 relative z-0">
-    <div class="flex justify-between">
-      <div class="flex space-x-2">
-        <CustomButton click={loadDevices}>Reload</CustomButton>
-      </div>
-    </div>
-    <h1 class="text-2xl font-bold mt-5">Lights</h1>
-    <div class="inline-flex flex-wrap justify-start mt-3">
-      {#each Object.entries(lights) as [_, light]}
-        <SmartDevice device={light} />
-      {/each}
-    </div>
-
-    <h1 class="text-2xl font-bold mt-5">Plugs</h1>
-    <div class="inline-flex justify-around mt-3">
-      {#each Object.entries(plugs) as [_, plug]}
-        <SmartDevice device={plug} />
-      {/each}
-    </div>
-
-    <SpeedDial defaultClass="absolute right-6 bottom-6" color="primary">
-      <SpeedDialButton name="Add&nbsp;Hue" on:click={() => (addHueOpen = true)}>
-        <GestureTapBoxIcon class="w-6 h-6" />
-      </SpeedDialButton>
-      <SpeedDialButton name="Add&nbsp;Wled">
-        <PlusIcon class="w-6 h-6" />
-      </SpeedDialButton>
-    </SpeedDial>
-  </div>
-
-  <Footer footerType="socialmedia" class="rounded-lg">
-    <div class="sm:flex sm:items-center sm:justify-end">
-      <FooterLinkGroup
-        ulClass="flex flex-wrap items-center mb-6 text-sm text-gray-500 sm:mb-0 dark:text-gray-400"
-      >
-        <FooterLink href="https://github.com/DerTyp7214/HomeApi">
-          HomeApi
-        </FooterLink>
-        <FooterLink href="https://github.com/DerTyp7214/HomeApiWeb">
-          HomeApiWeb
-        </FooterLink>
-        <FooterLink href="https://github.com/DerTyp7214/HomeApiPython">
-          HomeApiPython
-        </FooterLink>
-        <FooterLink href="https://github.com/DerTyp7214/HomeApiRust">
-          HomeApiRust
-        </FooterLink>
-      </FooterLinkGroup>
-    </div>
-    <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-    <div class="sm:flex sm:items-center sm:justify-between">
-      <FooterCopyright
-        href="https://github.com/DerTyp7214"
-        by="DerTyp7214"
-        year={2023}
-      />
-      <div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
-        <FooterIcon
-          href="https://github.com/DerTyp7214"
-          class="text-gray-400 hover:text-gray-900"
-        >
-          <GitHubIcon class="w-5 h-5" />
-        </FooterIcon>
-        <FooterIcon
-          href="https://twitter.com/DerTyp7214"
-          class="text-gray-400 hover:text-gray-900"
-        >
-          <TwitterIcon class="w-5 h-5" />
-        </FooterIcon>
-      </div>
-    </div>
-  </Footer>
-</div>
-
-<Settings bind:open={settingsOpen} />
-<AddHue bind:open={addHueOpen} />
+{#if connected}
+	{#if unauthorized}
+		<LightSwitch class="absolute right-8 top-8" />
+		{#if doSignup}
+			<form
+				autocomplete="off"
+				class="flex h-screen w-full flex-col items-center justify-center"
+				on:submit|preventDefault={submitSignup}
+			>
+				<h1 class="mb-5 text-2xl font-bold">Signup</h1>
+				<input
+					class="input m-2 w-10/12 p-2 pl-4 outline-none lg:w-1/2 2xl:w-1/3 {errorMessage
+						? 'input-error'
+						: ''}"
+					title="Username"
+					type="text"
+					name="username"
+					placeholder="Username"
+					required
+				/>
+				<input
+					class="input m-2 w-10/12 p-2 pl-4 outline-none lg:w-1/2 2xl:w-1/3 {errorMessage
+						? 'input-error'
+						: ''}"
+					title="Email"
+					type="email"
+					name="email"
+					placeholder="Email"
+					required
+				/>
+				<div
+					class="input-group-divider input-group m-2 w-10/12 grid-cols-[auto_1fr] lg:w-1/2 2xl:w-1/3"
+				>
+					<button
+						class="input-group-shim outline-none"
+						on:click|preventDefault={() => (showPassword = !showPassword)}
+					>
+						{#if showPassword}
+							<HideIcon />
+						{:else}
+							<ShowIcon />
+						{/if}
+					</button>
+					<input
+						class="p-2 outline-none {errorMessage ? 'input-error' : ''}"
+						title="Password"
+						type={showPassword ? 'text' : 'password'}
+						name="password"
+						placeholder="Password"
+						required
+					/>
+				</div>
+				<div
+					class="input-group-divider input-group m-2 w-10/12 grid-cols-[auto_1fr] lg:w-1/2 2xl:w-1/3"
+				>
+					<button
+						class="input-group-shim outline-none"
+						on:click|preventDefault={() => (showPassword = !showPassword)}
+					>
+						{#if showPassword}
+							<HideIcon />
+						{:else}
+							<ShowIcon />
+						{/if}
+					</button>
+					<input
+						class="p-2 outline-none {errorMessage ? 'input-error' : ''}"
+						title="Password confirmation"
+						type={showPassword ? 'text' : 'password'}
+						name="password_confirmation"
+						placeholder="Password confirmation"
+						required
+					/>
+				</div>
+				{#if errorMessage}
+					<p class="text-red-500">{errorMessage}</p>
+				{/if}
+				<LoadingButton
+					buttonClass="m-2 w-10/12 p-2 outline-none lg:w-1/2 2xl:w-1/3 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-full"
+					type="submit"
+					{loading}
+				>
+					Signup
+				</LoadingButton>
+				<p class="text-gray-600 dark:text-gray-400">
+					Already have an account?{' '}
+					<button
+						class="text-primary-500 hover:text-primary-600"
+						on:click={() => (doSignup = false)}
+					>
+						Login
+					</button>
+				</p>
+			</form>
+		{:else}
+			<form
+				autocomplete="off"
+				class="flex h-screen w-full flex-col items-center justify-center"
+				on:submit|preventDefault={submitLogin}
+			>
+				<h1 class="mb-5 text-2xl font-bold">Login</h1>
+				<input
+					class="input m-2 w-10/12 p-2 pl-4 outline-none lg:w-1/2 2xl:w-1/3 {errorMessage
+						? 'input-error'
+						: ''}"
+					title="Email"
+					type="email"
+					name="email"
+					placeholder="Email"
+					required
+				/>
+				<div
+					class="input-group-divider input-group m-2 w-10/12 grid-cols-[auto_1fr] lg:w-1/2 2xl:w-1/3"
+				>
+					<button
+						class="input-group-shim outline-none"
+						on:click|preventDefault={() => (showPassword = !showPassword)}
+					>
+						{#if showPassword}
+							<HideIcon />
+						{:else}
+							<ShowIcon />
+						{/if}
+					</button>
+					<input
+						class="p-2 outline-none {errorMessage ? 'input-error' : ''}"
+						title="Password"
+						type={showPassword ? 'text' : 'password'}
+						name="password"
+						placeholder="Password"
+						required
+					/>
+				</div>
+				{#if errorMessage}
+					<p class="text-red-500">{errorMessage}</p>
+				{/if}
+				<LoadingButton
+					buttonClass="m-2 w-10/12 p-2 outline-none lg:w-1/2 2xl:w-1/3 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-full"
+					type="submit"
+					{loading}
+				>
+					Login
+				</LoadingButton>
+				<p class="text-gray-600 dark:text-gray-400">
+					Don't have an account?{' '}
+					<button
+						class="text-primary-500 hover:text-primary-600"
+						on:click={() => (doSignup = true)}
+					>
+						Signup
+					</button>
+				</p>
+			</form>
+		{/if}
+	{:else if authorized}
+		<slot />
+	{:else if error}
+		<h1 class="text-2xl font-bold">Error</h1>
+		<p class="text-gray-400">{errorMessage}</p>
+	{/if}
+{:else if loading}
+	<div class="flex h-full w-full items-center justify-center">
+		<ProgressRadial value={undefined} />
+	</div>
+{/if}
