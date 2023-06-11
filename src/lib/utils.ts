@@ -33,3 +33,8 @@ export const filePicker = async (accept: string): Promise<File> => {
 		input.click();
 	});
 };
+
+export const capitalize = (str?: string) => {
+	if (!str) return '';
+	return str.charAt(0).toUpperCase() + str.slice(1);
+};

@@ -41,19 +41,26 @@
 		class="m-2 rounded-xl"
 	>
 		<svelte:fragment slot="lead">
-			{#if backBtn}
-				<button class="a-icon" on:click={() => window.history.back()}>
-					<BackIcon class="h-5 w-5" />
-				</button>
-			{:else if homeBtn}
-				<a href="/" class="a-icon">
-					<HomeIcon class="h-5 w-5" />
-				</a>
-			{:else}
-				<br />
-			{/if}
+			<a class="flex flex-row items-center" href="/">
+				<img src="/favicon.png" class="mr-5 h-8 w-8" alt="Icon" />
+				<span class="h4 mr-5"><span class="font-bold">Home</span>Api</span>
+				{#if backBtn}
+					<button
+						class="a-icon hidden sm:inline"
+						on:click|stopPropagation={() => window.history.back()}
+					>
+						<BackIcon class="h-5 w-5" />
+					</button>
+				{:else if homeBtn}
+					<a href="/" class="a-icon hidden sm:inline">
+						<HomeIcon class="h-5 w-5" />
+					</a>
+				{:else}
+					<br />
+				{/if}
+			</a>
 		</svelte:fragment>
-		{title}
+		<span class="hidden sm:inline">{title}</span>
 		<svelte:fragment slot="trail">
 			<div use:popup={popupUser}>
 				<Avatar
@@ -75,7 +82,7 @@
 					/>
 					<li class="flex flex-row items-center justify-between">
 						<span class="text-lg font-bold">{$user.username}</span>
-						<a class="cursor-pointer a-icon" href="/settings">
+						<a class="a-icon cursor-pointer" href="/settings">
 							<SettingsIcon />
 						</a>
 					</li>

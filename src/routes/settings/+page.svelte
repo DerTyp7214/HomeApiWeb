@@ -10,8 +10,11 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import Navigator from '$lib/components/Navigator.svelte';
+	import ProfileSettings from './ProfileSettings.svelte';
+	import { capitalize } from '$lib/utils';
+	import HueBridgesSettings from './HueBridgesSettings.svelte';
 
-	const pages = ['General', 'Security', 'Account', 'About', 'yeet'];
+	const pages = ['Profile', 'Hue-bridges'];
 
 	let currentPage = window.location.hash.replace('#', '');
 	currentPage =
@@ -48,21 +51,19 @@
 		class="transition-transform {positionClasses}"
 	>
 		<svelte:fragment slot="header">
-			<Header title="Settings" homeBtn backIfAvailable />
+			<Header
+				title="Settings / {capitalize(currentPage)}"
+				homeBtn
+				backIfAvailable
+			/>
 		</svelte:fragment>
 		<div class="h-full w-full p-4">
 			<div
 				class="card relative h-full w-full !bg-surface-200/50 dark:!bg-surface-800/50"
 			>
 				<Navigator {currentPage} bind:drawerSettings>
-					<div id="general">
-						<h1 class="text-2xl font-bold">General</h1>
-						<p class="text-lg">General settings</p>
-					</div>
-					<div id="security">
-						<h1 class="text-2xl font-bold">Security</h1>
-						<p class="text-lg">Security settings</p>
-					</div>
+					<ProfileSettings />
+					<HueBridgesSettings />
 					<div id="account">
 						<h1 class="text-2xl font-bold">Account</h1>
 						<p class="text-lg">Account settings</p>

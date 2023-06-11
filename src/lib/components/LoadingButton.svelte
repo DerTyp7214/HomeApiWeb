@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { ProgressRadial } from '@skeletonlabs/skeleton';
+	import {
+		ProgressRadial,
+		popup,
+		type PopupSettings,
+	} from '@skeletonlabs/skeleton';
 	import type { HTMLButtonAttributes } from 'svelte/elements/index';
 
 	export let asyncFunction: (event: Event) => Promise<any> = async () => {};

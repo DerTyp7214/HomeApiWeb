@@ -12,7 +12,7 @@
 		<svelte:fragment slot="header">
 			<Header />
 		</svelte:fragment>
-		<div class="h-full w-full p-4">
+		<div class="relative h-full w-full p-4">
 			<Devices />
 		</div>
 		<svelte:fragment slot="pageFooter">
