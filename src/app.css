@@ -1,92 +1,28 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  background-color: rgba(255, 255, 255, 0.87);
-  color: #1d1f24;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-.dark:root {
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #1d1f24;
-}
-
-* {
-  transition: background-color 0.2s ease-in-out;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 html,
-body,
-#app {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-.layout-content::-webkit-scrollbar {
-  background-color: transparent;
-  width: 18px;
-}
-
-.layout-content::-webkit-scrollbar-track {
-  margin-top: 6rem;
-  margin-bottom: 1rem;
-  background-color: transparent;
-  border-radius: 10px;
-}
-
-.layout-content::-webkit-scrollbar-thumb {
-  background-color: rgb(55, 65, 81);
-  border-radius: 10px;
-  background-clip: padding-box;
-  border: 4px solid transparent;
-}
-
-.layout-content::-webkit-scrollbar-thumb:hover {
-  background-color: #2c313a;
-}
-
-.customTable {
-  padding-left: 0.5rem;
-}
-
-.customTable > table {
-  border-radius: 0.5rem;
-  overflow: hidden;
-  margin-left: 0.5rem;
-  width: calc(100% - 0.5rem);
-}
-
-.customTable > div {
-  padding-left: 0.5rem;
-  padding-top: 0.75rem;
+body {
+	@apply h-full overflow-hidden;
 }
 
 #smart-device > div {
-  background: linear-gradient(
-    135deg,
-    var(--color-light) 0%,
-    color-mix(in xyz, var(--color-light) 20%, white) 100%
-  );
+	background: linear-gradient(
+		135deg,
+		var(--color-light) 0%,
+		color-mix(in xyz, var(--color-light) 20%, white) 100%
+	);
 }
 
 :is(.dark #smart-device > div) {
-  background: linear-gradient(
-    135deg,
-    var(--color-dark) 0%,
-    color-mix(in xyz, var(--color-dark) 20%, #1d1f24) 100%
-  );
+	background: linear-gradient(
+		135deg,
+		var(--color-dark) 0%,
+		color-mix(in xyz, var(--color-dark) 20%, #1d1f24) 100%
+	);
 }
 
-.customSidebar > div {
-  background: transparent;
+.a-icon {
+	@apply rounded-lg p-2  transition-all hover:bg-surface-300 active:bg-surface-400 dark:hover:bg-surface-600 dark:active:bg-surface-500;
 }
