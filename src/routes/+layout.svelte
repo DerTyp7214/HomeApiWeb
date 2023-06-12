@@ -23,7 +23,14 @@
 
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
-	import { checkApiUrl, login, me, signup } from '$lib/api';
+	import {
+		checkApiUrl,
+		connectEventSource,
+		disconnectEventSource,
+		login,
+		me,
+		signup,
+	} from '$lib/api';
 	import { pageThemeStore, userStore } from '$lib/stores';
 	import LoadingButton from '$lib/components/LoadingButton.svelte';
 	import { setTheme } from '$lib/utils';
@@ -62,6 +69,14 @@
 		} else {
 			authorized = false;
 			unauthorized = true;
+		}
+	}
+
+	$: {
+		if (authorized) {
+			connectEventSource();
+		} else {
+			disconnectEventSource();
 		}
 	}
 

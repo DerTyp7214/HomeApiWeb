@@ -1,4 +1,7 @@
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { userStore } from './stores';
+
+const ctrl = new AbortController();
 
 let _apiUrl =
 	localStorage.getItem('apiUrl') ??
@@ -296,16 +299,44 @@ export const getHueBridges = async () => {
 	throw new Error(json.message ?? 'Failed to fetch bridges');
 };
 
-export const connectWebSocket = () => {
-	const ws = new WebSocket(
-		_apiUrl.replace('http://', 'ws://').replace('/api', '/ws') +
-			`?token=${_jwt}`
-	);
-	ws.addEventListener('open', () => {
-		console.log('WebSocket connected');
+export const connectEventSource = async () => {
+	disconnectEventSource();
+	await fetchEventSource(_apiUrl.replace('/api', '/sse'), {
+		headers: {
+			Authorization: `Bearer ${_jwt}`,
+		},
+		signal: ctrl.signal,
+		onclose: () => {
+			console.log('SSE closed');
+		},
+		onopen: async (res) => {
+			console.log('SSE opened', res);
+		},
+		onmessage: (msg) => {
+			window.dispatchEvent(new CustomEvent('sse', { detail: msg }));
+		},
+		onerror: (err) => {
+			window.dispatchEvent(new CustomEvent('sse_error', { detail: err }));
+		},
 	});
-	ws.addEventListener('close', () => {
-		console.log('WebSocket disconnected');
+};
+
+export const disconnectEventSource = () => {
+	ctrl.abort();
+};
+
+export const onSse = (cb: (msg: SSEResponse) => void) => {
+	window.addEventListener('sse', (e) => {
+		const event = e as CustomEvent;
+		const msg: UnparsedSSEResponse = JSON.parse(event.detail.data);
+		const data = msg.data.length > 0 ? JSON.parse(msg.data) : undefined;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		cb({ type: msg.type as any, data });
 	});
-	return ws;
+};
+
+export const onSseError = (cb: (err: string) => void) => {
+	window.addEventListener('sse_error', (e) => {
+		cb((e as CustomEvent).detail);
+	});
 };

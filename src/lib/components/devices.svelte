@@ -3,7 +3,7 @@
 	import RefreshIcon from 'svelte-material-icons/Refresh.svelte';
 
 	import SmartDevice from '$lib/components/SmartDevice.svelte';
-	import { connectWebSocket, getLights, getPlugs } from '$lib/api';
+	import { getLights, getPlugs, onSse } from '$lib/api';
 	import { bridgeStore, lightsStore, plugsStore } from '$lib/stores';
 	import LoadingButton from './LoadingButton.svelte';
 	import {
@@ -64,22 +64,15 @@
 		component: 'addHueModal',
 	};
 
-	const ws = connectWebSocket();
-
-	ws.addEventListener('message', (event) => {
-		const { type, data } = JSON.parse(event.data);
-
-		if (!data) {
-			loadDevices();
-			return;
-		}
-
-		switch (type) {
-			case 'light':
-				lights[data.id] = data;
+	onSse((sseMessage) => {
+		switch (sseMessage.type) {
+			case 'light_update':
+				if (sseMessage.data) lights[sseMessage.data.id] = sseMessage.data;
+				else loadDevices();
 				break;
-			case 'plug':
-				plugs[data.id] = data;
+			case 'plug_update':
+				if (sseMessage.data) plugs[sseMessage.data.id] = sseMessage.data;
+				else loadDevices();
 				break;
 		}
 	});
@@ -120,7 +113,10 @@
 	<PlusIcon size="24px" />
 </button>
 
-<div class="card w-48 py-2 shadow-xl overflow-hidden" data-popup="popupCombobox">
+<div
+	class="card w-48 overflow-hidden py-2 shadow-xl"
+	data-popup="popupCombobox"
+>
 	<ListBox rounded="rounded-none">
 		<!--<ListBoxItem bind:group={comboboxValue} name="medium" value="wled">
 			W-Led

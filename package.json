@@ -1,6 +1,6 @@
 {
 	"name": "home-api-web",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
 		"preview": "vite preview",
@@ -9,6 +9,7 @@
 		"lint": "eslint --max-warnings 0 --fix . && svelte-check"
 	},
 	"dependencies": {
+		"@microsoft/fetch-event-source": "^2.0.1",
 		"@sveltejs/kit": "^1.20.2",
 		"svelte": "^3.59.1"
 	},

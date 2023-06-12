@@ -8,6 +8,21 @@ declare namespace App {
 	// interface Stuff {}
 }
 
+type SSEResponse =
+	| {
+			type: 'light_update';
+			data?: Light;
+	  }
+	| {
+			type: 'plug_update';
+			data?: Plug;
+	  };
+
+type UnparsedSSEResponse = {
+	type: string;
+	data: string;
+};
+
 type Light = {
 	id: string;
 	name: string;
