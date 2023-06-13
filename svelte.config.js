@@ -9,6 +9,11 @@ const config = {
 		}),
 	],
 	kit: {
+		appDir: 'app',
+		paths: {
+			base: '/static',
+			relative: false,
+		},
 		adapter: adapter({
 			pages: 'dist',
 			assets: 'dist',
