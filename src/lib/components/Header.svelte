@@ -14,6 +14,7 @@
 	import { pageThemeStore, userStore as user } from '$lib/stores';
 	import { getProfilePicture, logout } from '$lib/api';
 	import { setTheme, themeNames } from '$lib/utils';
+	import { dev } from '$app/environment';
 
 	export let title: string = 'Dashboard';
 	export let homeBtn: boolean = false;
@@ -110,9 +111,15 @@
 					<ul>
 						<li class="flex flex-row items-center justify-between">
 							<span class="text-lg font-bold">{$user.username}</span>
-							<a class="a-icon cursor-pointer" href="/settings">
-								<SettingsIcon />
-							</a>
+							{#if dev}
+								<a class="a-icon cursor-pointer" href="/settings">
+									<SettingsIcon />
+								</a>
+							{:else}
+								<a class="a-icon cursor-pointer" href="/static/settings">
+									<SettingsIcon />
+								</a>
+							{/if}
 						</li>
 						<li>
 							<a
